@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Menu, X, Phone, Settings, Check } from "lucide-react";
+import { Menu, X, Phone, Settings, Check, Lock } from "lucide-react";
 import logoImg from "../assets/images/trek_my_trip_dark_logo_1780387834698.png";
 
 interface NavbarProps {
@@ -7,12 +7,10 @@ interface NavbarProps {
   setWhatsappNumber: (num: string) => void;
 }
 
-export default function Navbar({ whatsappNumber, setWhatsappNumber }: NavbarProps) {
+export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsappNumber'>) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [tempNumber, setTempNumber] = useState(whatsappNumber);
-  const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -25,18 +23,6 @@ export default function Navbar({ whatsappNumber, setWhatsappNumber }: NavbarProp
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const handleSavePhone = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Keep only numbers and plus signs
-    const cleaned = tempNumber.replace(/[^0-9+]/g, "");
-    setWhatsappNumber(cleaned);
-    setSavedSuccess(true);
-    setTimeout(() => {
-      setSavedSuccess(false);
-      setShowConfigModal(false);
-    }, 1200);
-  };
 
   const navLinks = [
     { name: "Home", href: "#home" },
@@ -178,69 +164,56 @@ export default function Navbar({ whatsappNumber, setWhatsappNumber }: NavbarProp
             </button>
 
             <h3 className="font-display font-extrabold text-lg text-slate-800 mb-2 flex items-center gap-2">
-              <span className="p-1.5 rounded-lg bg-teal-50 text-primary">
-                <Settings className="w-5 h-5 text-primary" />
+              <span className="p-1.5 rounded-lg bg-teal-50 text-teal-600">
+                <Settings className="w-5 h-5" />
               </span>
-              Set Business Number
+              Booking Routing Status
             </h3>
             
             <p className="text-sm text-gray-500 mb-5 leading-relaxed">
-              Trek My Trip bookings will routing-redirect to this specific phone number on WhatsApp. Enter a full international format (e.g. <span className="font-mono text-[13px] bg-slate-100 px-1 rounded text-primary">919486360690</span>).
+              Trek My Trip booking requests and direct chats are routed securely to our official verified credentials.
             </p>
 
-            <form onSubmit={handleSavePhone} className="space-y-4">
+            <div className="space-y-4">
               <div>
-                <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
-                  WhatsApp Business Number
+                <label className="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">
+                  Active WhatsApp Booking Number
                 </label>
                 <div className="relative">
-                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-teal-600 font-extrabold text-sm">
                     +
                   </span>
                   <input
                     type="text"
-                    required
-                    value={tempNumber.startsWith("+") ? tempNumber.slice(1) : tempNumber}
-                    onChange={(e) => setTempNumber("+" + e.target.value.replace(/[^0-9]/g, ""))}
-                    placeholder="919486360690"
-                    className="w-full pl-7 pr-4 py-3 bg-slate-50 border border-slate-200 focus:border-primary focus:bg-white focus:outline-none rounded-xl text-slate-800 font-bold tracking-wide"
+                    readOnly
+                    disabled
+                    value={whatsappNumber}
+                    className="w-full pl-7 pr-10 py-3 bg-slate-50 border border-slate-150 rounded-xl text-slate-700 font-extrabold tracking-wide cursor-not-allowed select-all focus:outline-none"
                   />
+                  <span className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400">
+                    <Lock className="w-4 h-4 text-teal-600" />
+                  </span>
                 </div>
               </div>
 
-              <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex gap-3 text-xs text-amber-800">
-                <span className="font-bold">Note:</span>
-                <span>The link will open client WhatsApp or web interface with pre-formatted texts. Keep the country code to avoid routing delivery errors.</span>
+              <div className="p-3.5 bg-teal-50/50 border border-teal-100 rounded-xl flex gap-3 text-xs text-slate-600">
+                <div className="w-2 h-2 rounded-full bg-teal-500 animate-pulse mt-1 shrink-0" />
+                <span>
+                  <strong className="text-slate-800 block mb-0.5">Secure Booking Line Verified</strong>
+                  This routing line is active and locked by the system to maintain instant booking verification and group event notifications.
+                </span>
               </div>
 
-              <div className="flex gap-3 pt-2">
+              <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => {
-                    setTempNumber("919486360690");
-                    setWhatsappNumber("919486360690");
-                    setShowConfigModal(false);
-                  }}
-                  className="flex-1 py-3 border border-slate-200 text-slate-600 font-semibold text-sm rounded-xl hover:bg-slate-50 transition-colors"
+                  onClick={() => setShowConfigModal(false)}
+                  className="w-full py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm rounded-xl transition-all shadow-md flex items-center justify-center gap-1.5"
                 >
-                  Reset Default
-                </button>
-                <button
-                  type="submit"
-                  disabled={savedSuccess}
-                  className="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-teal-700/25 transition-all text-sm flex items-center justify-center gap-1"
-                >
-                  {savedSuccess ? (
-                    <>
-                      <Check className="w-4 h-4" />
-                      Saved!
-                    </>
-                  ) : (
-                    "Save Configurations"
-                  )}
+                  Close Settings
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}
