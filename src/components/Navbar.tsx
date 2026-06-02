@@ -1,0 +1,249 @@
+import React, { useState, useEffect } from "react";
+import { Menu, X, Phone, Settings, Check } from "lucide-react";
+import logoImg from "../assets/images/trek_my_trip_dark_logo_1780387834698.png";
+
+interface NavbarProps {
+  whatsappNumber: string;
+  setWhatsappNumber: (num: string) => void;
+}
+
+export default function Navbar({ whatsappNumber, setWhatsappNumber }: NavbarProps) {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showConfigModal, setShowConfigModal] = useState(false);
+  const [tempNumber, setTempNumber] = useState(whatsappNumber);
+  const [savedSuccess, setSavedSuccess] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 40) {
+        setIsScrolled(true);
+      } else {
+        setIsScrolled(false);
+      }
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  const handleSavePhone = (e: React.FormEvent) => {
+    e.preventDefault();
+    // Keep only numbers and plus signs
+    const cleaned = tempNumber.replace(/[^0-9+]/g, "");
+    setWhatsappNumber(cleaned);
+    setSavedSuccess(true);
+    setTimeout(() => {
+      setSavedSuccess(false);
+      setShowConfigModal(false);
+    }, 1200);
+  };
+
+  const navLinks = [
+    { name: "Home", href: "#home" },
+    { name: "Packages", href: "#packages" },
+    { name: "Testimonials", href: "#testimonials" },
+    { name: "FAQ", href: "#faq" },
+    { name: "Contact", href: "#contact" },
+  ];
+
+  return (
+    <>
+      <nav id="app-navbar"
+        className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${
+          isScrolled
+            ? "bg-white/95 shadow-md py-3 border-b border-gray-100 backdrop-blur-md"
+            : "bg-transparent py-5"
+        }`}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between">
+            {/* Logo */}
+            <a href="#home" className="flex items-center gap-2 group">
+              <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-slate-950 p-0.5 shadow-md group-hover:scale-105 transition-all">
+                <img
+                  src={logoImg}
+                  alt="Trek My Trip Logo"
+                  className="w-full h-full object-contain"
+                  referrerPolicy="no-referrer"
+                />
+              </div>
+              <div>
+                <span className={`font-display text-lg font-bold tracking-tight block ${
+                  isScrolled ? "text-primary" : "text-white"
+                } transition-colors`}>
+                  Trek My Trip
+                </span>
+                <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest block -mt-1.5">
+                  Explore Nature
+                </span>
+              </div>
+            </a>
+
+            {/* Desktop Navigation */}
+            <div className="hidden md:flex items-center gap-8">
+              {navLinks.map((link) => (
+                <a
+                  key={link.name}
+                  href={link.href}
+                  className={`font-semibold text-xs tracking-widest uppercase transition-all hover:text-secondary ${
+                    isScrolled ? "text-gray-700" : "text-white drop-shadow-md"
+                  }`}
+                >
+                  {link.name}
+                </a>
+              ))}
+            </div>
+
+            {/* CTA and Settings Actions */}
+            <div className="hidden md:flex items-center gap-3">
+              <button
+                onClick={() => setShowConfigModal(true)}
+                title="Configure WhatsApp Contact Number"
+                className={`p-2 rounded-lg transition-colors ${
+                  isScrolled ? "text-gray-500 hover:bg-gray-100" : "text-white hover:bg-white/10"
+                }`}
+              >
+                <Settings className="w-5 h-5 animate-hover-spin" />
+              </button>
+              
+              <a
+                href="#packages"
+                className="bg-secondary hover:bg-secondary-dark text-slate-900 font-bold px-5 py-2.5 rounded-lg shadow-lg shadow-amber-500/20 text-sm transition-all hover:-translate-y-0.5 active:translate-y-0"
+              >
+                Book Your Trip
+              </a>
+            </div>
+
+            {/* Mobile Actions */}
+            <div className="flex md:hidden items-center gap-2">
+              <button
+                onClick={() => setShowConfigModal(true)}
+                className={`p-2 rounded-lg ${
+                  isScrolled ? "text-gray-500" : "text-white"
+                }`}
+              >
+                <Settings className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className={`p-2 rounded-lg transition-colors ${
+                  isScrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white/10"
+                }`}
+              >
+                {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Navigation Drawer */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-b border-gray-100 py-4 px-6 flex flex-col gap-4 animate-fade-in">
+            {navLinks.map((link) => (
+              <a
+                key={link.name}
+                href={link.href}
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="font-semibold text-base text-gray-800 hover:text-primary py-2 border-b border-gray-50"
+              >
+                {link.name}
+              </a>
+            ))}
+            <div className="flex flex-col gap-3 pt-2">
+              <div className="flex items-center justify-between text-xs text-gray-500 bg-gray-50 rounded px-3 py-2">
+                <span>Receiver:</span>
+                <span className="font-mono font-bold text-gray-800">{whatsappNumber}</span>
+              </div>
+              <a
+                href="#packages"
+                onClick={() => setIsMobileMenuOpen(false)}
+                className="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-lg text-center shadow-lg transition-all"
+              >
+                Book Your Trip
+              </a>
+            </div>
+          </div>
+        )}
+      </nav>
+
+      {/* WhatsApp Configuration Modal */}
+      {showConfigModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full shadow-2xl p-6 relative overflow-hidden animate-scale-up">
+            <button
+              onClick={() => setShowConfigModal(false)}
+              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h3 className="font-display font-extrabold text-lg text-slate-800 mb-2 flex items-center gap-2">
+              <span className="p-1.5 rounded-lg bg-teal-50 text-primary">
+                <Settings className="w-5 h-5 text-primary" />
+              </span>
+              Set Business Number
+            </h3>
+            
+            <p className="text-sm text-gray-500 mb-5 leading-relaxed">
+              Trek My Trip bookings will routing-redirect to this specific phone number on WhatsApp. Enter a full international format (e.g. <span className="font-mono text-[13px] bg-slate-100 px-1 rounded text-primary">919486360690</span>).
+            </p>
+
+            <form onSubmit={handleSavePhone} className="space-y-4">
+              <div>
+                <label className="block text-xs font-bold text-gray-700 uppercase tracking-widest mb-2">
+                  WhatsApp Business Number
+                </label>
+                <div className="relative">
+                  <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm">
+                    +
+                  </span>
+                  <input
+                    type="text"
+                    required
+                    value={tempNumber.startsWith("+") ? tempNumber.slice(1) : tempNumber}
+                    onChange={(e) => setTempNumber("+" + e.target.value.replace(/[^0-9]/g, ""))}
+                    placeholder="919486360690"
+                    className="w-full pl-7 pr-4 py-3 bg-slate-50 border border-slate-200 focus:border-primary focus:bg-white focus:outline-none rounded-xl text-slate-800 font-bold tracking-wide"
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 bg-amber-50 border border-amber-100 rounded-xl flex gap-3 text-xs text-amber-800">
+                <span className="font-bold">Note:</span>
+                <span>The link will open client WhatsApp or web interface with pre-formatted texts. Keep the country code to avoid routing delivery errors.</span>
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setTempNumber("919486360690");
+                    setWhatsappNumber("919486360690");
+                    setShowConfigModal(false);
+                  }}
+                  className="flex-1 py-3 border border-slate-200 text-slate-600 font-semibold text-sm rounded-xl hover:bg-slate-50 transition-colors"
+                >
+                  Reset Default
+                </button>
+                <button
+                  type="submit"
+                  disabled={savedSuccess}
+                  className="flex-1 bg-primary hover:bg-primary-dark text-white font-bold py-3 rounded-xl shadow-lg hover:shadow-teal-700/25 transition-all text-sm flex items-center justify-center gap-1"
+                >
+                  {savedSuccess ? (
+                    <>
+                      <Check className="w-4 h-4" />
+                      Saved!
+                    </>
+                  ) : (
+                    "Save Configurations"
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </>
+  );
+}
