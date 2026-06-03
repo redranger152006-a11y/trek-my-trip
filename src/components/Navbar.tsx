@@ -4,10 +4,10 @@ import logoImg from "../assets/images/trek_my_trip_dark_logo_1780387834698.png";
 
 interface NavbarProps {
   whatsappNumber: string;
-  setWhatsappNumber: (num: string) => void;
+  currentRoute: string;
 }
 
-export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsappNumber'>) {
+export default function Navbar({ whatsappNumber, currentRoute }: NavbarProps) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showConfigModal, setShowConfigModal] = useState(false);
@@ -24,10 +24,16 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const isHome = currentRoute === "" || currentRoute === "#home";
+
+  const isActive = (href: string) => {
+    if (href === "#home") return isHome;
+    return currentRoute.startsWith(href);
+  };
+
   const navLinks = [
     { name: "Home", href: "#home" },
     { name: "Packages", href: "#packages" },
-    { name: "Testimonials", href: "#testimonials" },
     { name: "FAQ", href: "#faq" },
     { name: "Contact", href: "#contact" },
   ];
@@ -35,9 +41,9 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
   return (
     <>
       <nav id="app-navbar"
-        className={`fixed top-0 left-0 w-full z-40 transition-all duration-300 ${
-          isScrolled
-            ? "bg-white/95 shadow-md py-3 border-b border-gray-100 backdrop-blur-md"
+        className={`fixed top-0 left-0 w-full z-45 transition-all duration-300 ${
+          isScrolled || !isHome
+            ? "bg-slate-950/95 shadow-xl py-3 border-b border-slate-850 backdrop-blur-md"
             : "bg-transparent py-5"
         }`}
       >
@@ -54,9 +60,7 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
                 />
               </div>
               <div>
-                <span className={`font-display text-lg font-bold tracking-tight block ${
-                  isScrolled ? "text-primary" : "text-white"
-                } transition-colors`}>
+                <span className="font-display text-lg font-bold tracking-tight block text-white transition-colors">
                   Trek My Trip
                 </span>
                 <span className="text-[9px] font-bold text-amber-500 uppercase tracking-widest block -mt-1.5">
@@ -71,8 +75,10 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
                 <a
                   key={link.name}
                   href={link.href}
-                  className={`font-semibold text-xs tracking-widest uppercase transition-all hover:text-secondary ${
-                    isScrolled ? "text-gray-700" : "text-white drop-shadow-md"
+                  className={`font-extrabold text-xs tracking-widest uppercase transition-all hover:text-secondary ${
+                    isActive(link.href)
+                      ? "text-secondary font-black"
+                      : "text-slate-300 hover:text-white drop-shadow-md"
                   }`}
                 >
                   {link.name}
@@ -85,9 +91,7 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
               <button
                 onClick={() => setShowConfigModal(true)}
                 title="Configure WhatsApp Contact Number"
-                className={`p-2 rounded-lg transition-colors ${
-                  isScrolled ? "text-gray-500 hover:bg-gray-100" : "text-white hover:bg-white/10"
-                }`}
+                className="p-2 rounded-lg transition-colors text-slate-300 hover:text-white hover:bg-white/10"
               >
                 <Settings className="w-5 h-5 animate-hover-spin" />
               </button>
@@ -104,17 +108,13 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
             <div className="flex md:hidden items-center gap-2">
               <button
                 onClick={() => setShowConfigModal(true)}
-                className={`p-2 rounded-lg ${
-                  isScrolled ? "text-gray-500" : "text-white"
-                }`}
+                className="p-2 rounded-lg text-slate-350 hover:text-white hover:bg-white/10 transition-colors"
               >
                 <Settings className="w-5 h-5" />
               </button>
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={`p-2 rounded-lg transition-colors ${
-                  isScrolled ? "text-gray-700 hover:bg-gray-100" : "text-white hover:bg-white/10"
-                }`}
+                className="p-2 rounded-lg transition-colors text-slate-350 hover:text-white hover:bg-white/10"
               >
                 {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -124,21 +124,23 @@ export default function Navbar({ whatsappNumber }: Omit<NavbarProps, 'setWhatsap
 
         {/* Mobile Navigation Drawer */}
         {isMobileMenuOpen && (
-          <div className="md:hidden absolute top-full left-0 w-full bg-white shadow-xl border-b border-gray-100 py-4 px-6 flex flex-col gap-4 animate-fade-in">
+          <div className="md:hidden absolute top-full left-0 w-full bg-slate-950 shadow-2xl border-b border-slate-850 py-4 px-6 flex flex-col gap-4 animate-fade-in">
             {navLinks.map((link) => (
               <a
                 key={link.name}
                 href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="font-semibold text-base text-gray-800 hover:text-primary py-2 border-b border-gray-50"
+                className={`font-semibold text-base py-2 border-b border-slate-900 transition-colors ${
+                  isActive(link.href) ? "text-secondary font-black" : "text-slate-200 hover:text-white"
+                }`}
               >
                 {link.name}
               </a>
             ))}
             <div className="flex flex-col gap-3 pt-2">
-              <div className="flex items-center justify-between text-xs text-gray-500 bg-gray-50 rounded px-3 py-2">
+              <div className="flex items-center justify-between text-xs text-slate-400 bg-slate-900/60 border border-slate-850 rounded px-3 py-2">
                 <span>Receiver:</span>
-                <span className="font-mono font-bold text-gray-800">{whatsappNumber}</span>
+                <span className="font-mono font-bold text-slate-200">+{whatsappNumber}</span>
               </div>
               <a
                 href="#packages"
